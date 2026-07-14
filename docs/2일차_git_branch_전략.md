@@ -20,7 +20,7 @@
 
 ## 2. 5조 선정 전략: "실용적 간소화 Git Flow (Lightweight Git Flow)"
 
-우리 5조는 Git Flow의 **체계적인 안정성**과 GitHub Flow의 **민첩함**을 동시에 챙기기 위해, 기존 Git Flow를 프로젝트 규모에 맞게 간소화한 **`main` - `develop` - `issue`** 3단계 브랜치 전략을 사용합니다.
+우리 5조는 Git Flow의 **체계적인 안정성**과 GitHub Flow의 **민첩함**을 동시에 챙기기 위해, 기존 Git Flow를 프로젝트 규모에 맞게 간소화한 **`main` - `dev` - `issue number`** 3단계 브랜치 전략을 사용합니다.
 
 ```text
 [main] (최종 배포 및 제출용 브랜치)

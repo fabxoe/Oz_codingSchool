@@ -1,10 +1,10 @@
 
-from pydantic import BaseModel
+import re
+
+from pydantic import BaseModel, Field, field_validator
 from typing import List
 from fastapi import APIRouter, FastAPI, HTTPException, Path, status
 
-
-router = APIRouter()
 
 router = APIRouter(prefix="/practice_api", tags=["practice"])
 
@@ -39,7 +39,7 @@ class UserResponse(BaseModel):
     age: int
     email: str
 # 모든 회원 목록 조회 API (요구사항 데코레이터와 응답 모델 적용)
-@app.get("/practice_api/users", response_model=List[UserResponse])
+@app.get("/users", response_model=List[UserResponse])
 def get_users_handler():
     # 이렇게 user_list를 바로 리턴해도, FastAPI가 UserResponse 모델에 맞춰 
     # password(비밀번호)를 자동으로 제외하고 필터링해 줍니다!
@@ -47,7 +47,7 @@ def get_users_handler():
 
 
 #현승
-@router.get('/practice_api/users/{user_id}')
+@router.get('/users/{user_id}')
 def get_user_handler(
     user_id:int = Path(..., ge=1)
 ):
@@ -67,8 +67,56 @@ def get_user_handler(
         )
 
 
-def create_user_handler():
-    pass
+# 회원의 정보를 Request Body로 입력받아 user_list에 추가하는 API
+EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+SPECIAL_PATTERN = re.compile(r"[!@#$%^&*(),.?\":{}|<>_\-+=\[\]/\\~`';]")
+
+
+class UserCreate(BaseModel):
+    name: str = Field(..., min_length=2, max_length=10)
+    age: int = Field(..., ge=14)
+    email: str = Field(..., max_length=30)
+    password: str = Field(..., min_length=8, max_length=20)
+
+    @field_validator("email")
+    @classmethod
+    def check_email(cls, v: str) -> str:
+        if not EMAIL_PATTERN.match(v):
+            raise ValueError("올바른 이메일 형식이 아닙니다.")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def check_password(cls, v: str) -> str:
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("비밀번호에 대문자가 1개 이상 필요합니다.")
+        if not re.search(r"[a-z]", v):
+            raise ValueError("비밀번호에 소문자가 1개 이상 필요합니다.")
+        if not SPECIAL_PATTERN.search(v):
+            raise ValueError("비밀번호에 특수문자가 1개 이상 필요합니다.")
+        return v
+
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    age: int
+    email: str
+    # password 없음 → 응답에서 자동 제외
+
+@router.post("/users", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+def create_user_handler(payload: UserCreate):
+    # 이메일 중복 — user_list를 봐야 하므로 스키마가 아닌 여기서
+    if any(u["email"] == payload.email for u in user_list):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="이미 사용 중인 이메일입니다.",
+        )
+
+    new_id = max((u["id"] for u in user_list), default=0) + 1
+    new_user = {"id": new_id, **payload.model_dump()}
+    user_list.append(new_user)
+    return new_user
 
 
 def update_user_handler():

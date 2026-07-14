@@ -22,13 +22,13 @@
 
 우리 5조는 Git Flow의 **체계적인 안정성**과 GitHub Flow의 **민첩함**을 동시에 챙기기 위해, 기존 Git Flow를 프로젝트 규모에 맞게 간소화한 **`main` - `develop` - `issue`** 3단계 브랜치 전략을 사용합니다.
 
+```text
 [main] (최종 배포 및 제출용 브랜치)
-│
+  │
 [develop] (개발 통합 및 테스트 브랜치)
-│
-├─ [feature/#1-get-users] (팀원: 전체조회 개발) ──▶ (develop으로 PR/Merge)
-│
-└─ [feature/#2-get-user]  (팀원: 단건조회 개발) ──▶ (develop으로 PR/Merge)
+  │
+  ├─ [feature/#1-get-users] (팀원: 전체조회 개발) ──▶ (develop으로 PR/Merge)
+  └─ [feature/#2-get-user]  (팀원: 단건조회 개발) ──▶ (develop으로 PR/Merge)
 
 📌 주요 브랜치 정의 및 운용 규칙
 | 브랜치명 | 대상 부모 브랜치 | 머지 대상 브랜치 | 설명 및 운용 규칙 |

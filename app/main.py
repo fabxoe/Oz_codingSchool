@@ -4,6 +4,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 from starlette.responses import FileResponse
+from app.apis.practice_apis import router as practice_router
 
 from app.apis.practice_apis import router as practice_router   # ← 추가
 

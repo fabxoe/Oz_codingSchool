@@ -1,6 +1,8 @@
+
 from fastapi import APIRouter, FastAPI, HTTPException, Path, status
 
-app = FastAPI()
+
+router = APIRouter()
 
 router = APIRouter(prefix="/practice_api", tags=["practice"])
 
@@ -33,8 +35,25 @@ def get_users_handler():
     pass
 
 
-def get_user_handler():
-    pass
+#현승
+@router.get('/practice_api/users/{user_id}')
+def get_user_handler(
+    user_id:int = Path(..., ge=1)
+):
+    for user in user_list:
+        if user['id'] == user_id:
+            return {
+                "id": user["id"],
+                "name": user["name"],
+                "age": user["age"],
+                "email": user["email"]
+            }
+        
+
+    raise HTTPException(
+        status_code=404,
+        detail="User not found"
+        )
 
 
 def create_user_handler():

@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Path
+from pydantic import BaseModel  # pydantic 추가
+from typing import List
 
 app = FastAPI()
 
@@ -26,9 +28,18 @@ user_list = [
 	}
 ]
 
-
+# 강사님이 알려주신 응답 전용 데이터 모델 정의 (password 제외)
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    age: int
+    email: str
+# 모든 회원 목록 조회 API (요구사항 데코레이터와 응답 모델 적용)
+@app.get("/practice_api/users", response_model=List[UserResponse])
 def get_users_handler():
-    pass
+    # 이렇게 user_list를 바로 리턴해도, FastAPI가 UserResponse 모델에 맞춰 
+    # password(비밀번호)를 자동으로 제외하고 필터링해 줍니다!
+    return user_list
 
 
 def get_user_handler():

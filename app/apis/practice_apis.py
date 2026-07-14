@@ -25,3 +25,23 @@ user_list = [
 		"password": "lwsPAssword12@"
 	}
 ]
+
+
+def get_users_handler():
+    pass
+
+
+def get_user_handler():
+    pass
+
+
+def create_user_handler():
+    pass
+
+
+def update_user_handler():
+    pass
+
+
+def delete_user_handler():
+    pass

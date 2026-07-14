@@ -25,10 +25,10 @@
 ```text
 [main] (최종 배포 및 제출용 브랜치)
   │
-[develop] (개발 통합 및 테스트 브랜치)
+[dev] (개발 통합 및 테스트 브랜치)
   │
-  ├─ [feature/#1-get-users] (팀원: 전체조회 개발) ──▶ (develop으로 PR/Merge)
-  └─ [feature/#2-get-user]  (팀원: 단건조회 개발) ──▶ (develop으로 PR/Merge)
+  ├─ [#1-get-users] (팀원: 전체조회 개발) ──▶ (dev으로 PR/Merge)
+  └─ [#2-get-user]  (팀원: 단건조회 개발) ──▶ (dev으로 PR/Merge)
 ```
 
 📌 주요 브랜치 정의 및 운용 규칙

@@ -29,6 +29,7 @@
   │
   ├─ [feature/#1-get-users] (팀원: 전체조회 개발) ──▶ (develop으로 PR/Merge)
   └─ [feature/#2-get-user]  (팀원: 단건조회 개발) ──▶ (develop으로 PR/Merge)
+```
 
 📌 주요 브랜치 정의 및 운용 규칙
 | 브랜치명 | 대상 부모 브랜치 | 머지 대상 브랜치 | 설명 및 운용 규칙 |

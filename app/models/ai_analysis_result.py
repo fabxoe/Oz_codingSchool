@@ -1,0 +1,51 @@
+from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String
+from sqlalchemy.sql import func
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.core.db.databases import Base
+
+
+class AIAnalysisResult(Base):
+    __tablename__ = "ai_analysis_results"
+
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True
+    )
+
+    record_id: Mapped[int] = mapped_column(
+        ForeignKey("medical_records.id", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    is_pneumonia: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False
+    )
+
+    confidence: Mapped[float] = mapped_column(
+        Numeric(5, 2),
+        nullable=False
+    )
+
+    heatmap_url: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False
+    )
+
+    ai_model: Mapped[str] = mapped_column(
+        String(50),
+        nullable=False
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=func.now()
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime
+    )

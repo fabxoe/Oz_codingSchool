@@ -1,10 +1,10 @@
 
+
 import re
 
 from pydantic import BaseModel, Field, field_validator
 from typing import List
 from fastapi import APIRouter, FastAPI, HTTPException, Path, status
-
 
 router = APIRouter(prefix="/practice_api", tags=["practice"])
 

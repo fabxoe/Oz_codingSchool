@@ -34,6 +34,6 @@ class User(Base):
     role: Mapped[Role] = mapped_column(Enum(Role), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
     
     uploaded_xrays: Mapped[list["XrayImage"]] = relationship(back_populates="uploader")

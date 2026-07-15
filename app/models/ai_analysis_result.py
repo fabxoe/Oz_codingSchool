@@ -14,6 +14,6 @@ class AIAnalysisResult(Base):
     heatmap_url: Mapped[str] = mapped_column(String(255), nullable=False)
     ai_model: Mapped[str] = mapped_column(String(50), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
 
     medical_record: Mapped["MedicalRecord"] = relationship(back_populates="ai_analysis_results")

@@ -13,9 +13,9 @@ class MedicalRecord(Base):
     chart_number: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     symptoms: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
 
      # 관계 설정
     patient: Mapped["Patient"] = relationship(back_populates="medical_records")
-    xray_images: Mapped[list["XrayImage"]] = relationship(back_populates="medical_records")
-    ai_analysis_results: Mapped[list["AIAnalysisResult"]] = relationship(back_populates="medical_records")
+    xray_images: Mapped[list["XrayImage"]] = relationship(back_populates="medical_record")
+    ai_analysis_results: Mapped[list["AIAnalysisResult"]] = relationship(back_populates="medical_record")

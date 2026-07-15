@@ -14,6 +14,6 @@ class Patient(Base):
     gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
     phone: Mapped[str] = mapped_column(String(11), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
 
     medical_records: Mapped[list["MedicalRecord"]] = relationship(back_populates="patient")

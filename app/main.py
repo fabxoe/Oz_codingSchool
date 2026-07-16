@@ -5,7 +5,13 @@ from fastapi import FastAPI
 from starlette.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 
+from app.apis.auth import router as auth_router
+
 app = FastAPI()
+
+# 반드시 파일 하단의 catch_all("/{path:path}") 보다 위에서 등록해야 한다.
+# 아래에 두면 모든 GET 요청이 index.html로 삼켜진다.
+app.include_router(auth_router)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

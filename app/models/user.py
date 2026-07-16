@@ -9,7 +9,6 @@ class Gender(str, enum.Enum):
     MALE = "male"
     FEMALE = "female"
 
-
 class Role(str, enum.Enum):
     PENDING = "pending"
     STAFF = "staff"

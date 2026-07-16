@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 
 from sqlalchemy import Boolean, DateTime, Enum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db.databases import Base
 
@@ -38,3 +38,5 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    uploaded_xrays: Mapped[list["XRayImage"]] = relationship(back_populates="uploader")

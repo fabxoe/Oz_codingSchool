@@ -2,7 +2,8 @@ from app.core.db.databases import Base
 
 from datetime import datetime
 from sqlalchemy import Boolean, DateTime, Enum, String, Text, BigInteger, ForeignKey, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 
 class MedicalRecord(Base):
     __tablename__ = "medical_records"
@@ -13,3 +14,8 @@ class MedicalRecord(Base):
     symptoms: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+     # 관계 설정
+    patient: Mapped["Patient"] = relationship(back_populates="medical_records")
+    xray_images: Mapped[list["XrayImage"]] = relationship(back_populates="medical_records")
+    ai_analysis_results: Mapped[list["AIAnalysisResult"]] = relationship(back_populates="medical_records")

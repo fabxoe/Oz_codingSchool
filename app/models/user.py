@@ -2,7 +2,7 @@ from app.core.db.databases import Base
 import enum
 from datetime import datetime
 from sqlalchemy import Boolean, DateTime, Enum, String, BigInteger,text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class Gender(str, enum.Enum):
@@ -35,3 +35,5 @@ class User(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    
+    uploaded_xrays: Mapped[list["XrayImage"]] = relationship(back_populates="uploader")

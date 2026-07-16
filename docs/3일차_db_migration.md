@@ -16,7 +16,16 @@ Package Manager: uv
 
 ## 3. 작성한 테이블
 
-이번 마이그레이션에서 생성한 테이블은 다음과 같다.
+### SQLAlchemy가 사용하는 관계 설정
+| 테이블(모델) | 수정 사항 | 이유 |
+| :--- | :--- | :--- |
+| **`AIAnalysisResult`** | `xray_image_id` 제거 | 설계도와 관계 일치 및 종속성 해소 |
+| **`MedicalRecord`** | `doctor_id` 필드 제거 | 참고 설계도 구조와 동일하게 맞춤 |
+| **`XrayImage`** | `uploader_id` 추가 | 사진 업로더 추적성 확보 (User 관계 연결) |
+| **`User`** | `uploaded_xrays` 관계 추가 | 사진 업로드 기록 조회 가능하도록 설정 |
+
+
+ORM 작성을 통해서 이번 마이그레이션에서 생성한 테이블은 다음과 같다.
 
 ```text
 users
@@ -26,6 +35,7 @@ xray_images
 ai_analysis_results
 alembic_version
 ```
+
 
 `alembic_version` 테이블은 Alembic이 현재 DB에 적용된 migration revision을 관리하기 위해 자동으로 생성하는 테이블이다.
 

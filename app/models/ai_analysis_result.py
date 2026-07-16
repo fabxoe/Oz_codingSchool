@@ -1,6 +1,6 @@
 from app.core.db.databases import Base
 from sqlalchemy import String, BigInteger, DateTime, ForeignKey, Boolean, Numeric, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from decimal import Decimal
 
@@ -15,3 +15,5 @@ class AIAnalysisResult(Base):
     ai_model: Mapped[str] = mapped_column(String(50), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+
+    medical_record: Mapped["MedicalRecord"] = relationship(back_populates="ai_analysis_results")

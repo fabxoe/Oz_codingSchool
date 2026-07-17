@@ -15,6 +15,10 @@ settings.json
 # Virtual environments
 .venv
 
+# macOS
+.DS_Store
+*.DS_Store
+
 # Environment files
 envs/
 *.env

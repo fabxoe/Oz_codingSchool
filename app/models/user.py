@@ -1,7 +1,7 @@
 from app.core.db.databases import Base
 import enum
 from datetime import datetime
-from sqlalchemy import Boolean, DateTime, Enum, String, BigInteger,text
+from sqlalchemy import Boolean, DateTime, Enum, String, BigInteger,text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -33,7 +33,7 @@ class User(Base):
     department: Mapped[Department] = mapped_column(Enum(Department), nullable=False)
     role: Mapped[Role] = mapped_column(Enum(Role), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP"))
-    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, onupdate=text("CURRENT_TIMESTAMP"))
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=func.now())
+    updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True, onupdate=func.now())
     
     uploaded_xrays: Mapped[list["XrayImage"]] = relationship(back_populates="uploader")

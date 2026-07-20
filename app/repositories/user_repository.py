@@ -27,6 +27,16 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     @staticmethod
+    async def get_by_phone_number(
+        db: AsyncSession,
+        phone_number: str,
+    ) -> User | None:
+        result = await db.execute(
+            select(User).where(User.phone_number == phone_number)
+        )
+        return result.scalar_one_or_none()
+
+    @staticmethod
     async def create(
         db: AsyncSession,
         user: User,
@@ -69,3 +79,20 @@ class UserRepository:
         await db.commit()
         await db.refresh(user)
         return user
+
+    @staticmethod
+    async def update(
+        db: AsyncSession,
+        user: User,
+    ) -> User:
+        await db.commit()
+        await db.refresh(user)
+        return user
+
+    @staticmethod
+    async def delete(
+        db: AsyncSession,
+        user: User,
+    ) -> None:
+        await db.delete(user)
+        await db.commit()

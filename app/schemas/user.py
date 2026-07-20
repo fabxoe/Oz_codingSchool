@@ -13,7 +13,7 @@ class UserSignupRequest(BaseModel):
 
 
 class UserLoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     password: str
 
 
@@ -27,9 +27,8 @@ class UserResponse(BaseModel):
     role: Role
     is_active: bool
 
-    model_config = {
-        "from_attributes": True
-    }
+    model_config = {"from_attributes": True}
+
 
 class LoginResponse(BaseModel):
     access_token: str
@@ -39,3 +38,13 @@ class LoginResponse(BaseModel):
 class UserRoleUpdateRequest(BaseModel):
     user_id: int
     new_role: Role
+
+
+class UserUpdateRequest(BaseModel):
+    department: Department | None = None
+    phone_number: str | None = None
+
+
+class UserPasswordUpdateRequest(BaseModel):
+    current_password: str
+    new_password: str

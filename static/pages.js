@@ -314,7 +314,7 @@ const pages = {
             e.target.reset();
         } catch (err) {
             let msg = err.message;
-            if (err.status === 400) {
+            if (err.status === 400 && msg.includes('비밀번호는 대소문자')) {
                 msg = '비밀번호는 "대소문자, 특수문자, 숫자를 각 1개씩 포함한 8자리 이상이어야 합니다."';
             } else if (err.status === 500) {
                 msg = '잠시 후 다시시도해주세요.';

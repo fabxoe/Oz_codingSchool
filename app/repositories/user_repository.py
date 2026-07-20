@@ -1,7 +1,7 @@
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
+from app.models.user import Department, Role, User
 
 
 class UserRepository:
@@ -32,6 +32,40 @@ class UserRepository:
         user: User,
     ) -> User:
         db.add(user)
+        await db.commit()
+        await db.refresh(user)
+        return user
+
+    @staticmethod
+    async def get_all(
+        db: AsyncSession,
+        query: str | None = None,
+        department: Department | None = None,
+    ) -> list[User]:
+        statement = select(User)
+
+        if query:
+            search_pattern = f"%{query}%"
+            statement = statement.where(
+                or_(
+                    User.name.like(search_pattern),
+                    User.email.like(search_pattern),
+                )
+            )
+
+        if department is not None:
+            statement = statement.where(User.department == department)
+
+        result = await db.execute(statement.order_by(User.id))
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def update_role(
+        db: AsyncSession,
+        user: User,
+        new_role: Role,
+    ) -> User:
+        user.role = new_role
         await db.commit()
         await db.refresh(user)
         return user

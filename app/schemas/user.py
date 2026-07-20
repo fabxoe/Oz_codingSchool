@@ -34,3 +34,8 @@ class UserResponse(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "Bearer"
+
+
+class UserRoleUpdateRequest(BaseModel):
+    user_id: int
+    new_role: Role

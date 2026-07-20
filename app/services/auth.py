@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.security import create_token  # 1번 담당자가 만드는 공통 함수
-from app.repositories.user import user_repository  # 담당자 리포지토리
+from app.repositories.user_repository import UserRepository
 
 
 async def refresh_access_token(db: AsyncSession, refresh_token: str) -> str:
@@ -40,7 +40,7 @@ async def refresh_access_token(db: AsyncSession, refresh_token: str) -> str:
             detail="유효하지 않은 인증 토큰입니다.",
         )
 
-    user = await user_repository.get_by_id(db, user_id)
+    user = await UserRepository.get_by_id(db, user_id)
     if user is None or not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

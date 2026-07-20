@@ -2,7 +2,7 @@ from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db.databases import async_get_db
-from app.core.dependencies import get_current_user  # 3번 담당자가 만드는 인증 dependency
+from app.core.security import get_current_user
 from app.models.user import User
 from app.services.auth import refresh_access_token
 

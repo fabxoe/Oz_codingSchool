@@ -145,7 +145,15 @@ const pages = {
 
     async renderRecordDetail(recordId) {
         const record = await apis.getMedicalRecord(recordId);
-        const analyses = await apis.getMedicalRecordAnalyses(recordId);
+        let analyses = [];
+        try {
+            analyses = await apis.getMedicalRecordAnalyses(recordId, true);
+        } catch (err) {
+            if (err.status !== 404) {
+                utils.showAlert(err.message, 'error', '오류');
+                throw err;
+            }
+        }
         const html = await utils.loadTemplate('record-detail');
         const app = document.getElementById('app');
         app.innerHTML = html;

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -6,14 +8,12 @@ from app.models.xray_image import XrayImage
 
 
 class MedicalRecordRepository:
-    """진료기록 테이블에 대한 DB 조회를 모아둔 클래스."""
 
     @staticmethod
     async def get_by_patient_id(
         db: AsyncSession,
         patient_id: int,
     ) -> list[MedicalRecord]:
-        # 특정 환자의 진료기록 목록을 최신순으로 조회
         statement = (
             select(MedicalRecord)
             .where(MedicalRecord.patient_id == patient_id)
@@ -27,8 +27,21 @@ class MedicalRecordRepository:
         db: AsyncSession,
         record_id: int,
     ) -> MedicalRecord | None:
-        statement = select(MedicalRecord).where(MedicalRecord.id == record_id)
-        result = await db.execute(statement)
+        result = await db.execute(
+            select(MedicalRecord).where(MedicalRecord.id == record_id)
+        )
+        return result.scalar_one_or_none()
+
+    @staticmethod
+    async def get_by_chart_number(
+        db: AsyncSession,
+        chart_number: str,
+    ) -> MedicalRecord | None:
+        result = await db.execute(
+            select(MedicalRecord).where(
+                MedicalRecord.chart_number == chart_number
+            )
+        )
         return result.scalar_one_or_none()
 
     @staticmethod
@@ -36,7 +49,6 @@ class MedicalRecordRepository:
         db: AsyncSession,
         record_id: int,
     ) -> str | None:
-        # 진료기록에 연결된 X-Ray 이미지 중 가장 최근 것의 URL을 반환
         statement = (
             select(XrayImage.image_url)
             .where(XrayImage.record_id == record_id)
@@ -44,3 +56,40 @@ class MedicalRecordRepository:
         )
         result = await db.execute(statement)
         return result.scalars().first()
+
+    @staticmethod
+    async def get_image_urls_by_patient(
+        db: AsyncSession,
+        patient_id: int,
+    ) -> list[str]:
+        statement = (
+            select(XrayImage.image_url)
+            .join(MedicalRecord, XrayImage.record_id == MedicalRecord.id)
+            .where(MedicalRecord.patient_id == patient_id)
+        )
+        result = await db.execute(statement)
+        return list(result.scalars().all())
+
+    @staticmethod
+    async def create_with_image(
+        db: AsyncSession,
+        record: MedicalRecord,
+        image_url: str,
+        uploader_id: int,
+        shooting_datetime: datetime,
+    ) -> MedicalRecord:
+        db.add(record)
+        await db.flush()
+
+        db.add(
+            XrayImage(
+                record_id=record.id,
+                uploader_id=uploader_id,
+                image_url=image_url,
+                shooting_datetime=shooting_datetime,
+            )
+        )
+
+        await db.commit()
+        await db.refresh(record)
+        return record

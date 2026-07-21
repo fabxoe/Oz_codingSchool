@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class MedicalRecordListItem(BaseModel):
@@ -11,8 +11,7 @@ class MedicalRecordListItem(BaseModel):
     symptoms: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class MedicalRecordDetailResponse(BaseModel):
@@ -25,5 +24,4 @@ class MedicalRecordDetailResponse(BaseModel):
     xray_image_url: str | None
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

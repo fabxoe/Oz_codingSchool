@@ -25,3 +25,4 @@ envs/
 .env
 
 .python-version
+worker/models/

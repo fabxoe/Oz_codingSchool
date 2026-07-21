@@ -10,13 +10,20 @@ from app.apis.auth_api import router as auth_router
 from app.apis.patient import router as patient_router
 from app.apis.medical_record import router as medical_record_router
 
-app = FastAPI()
+# 1. 폐렴 예측 라우터 및 lifespan 임포트
+from app.routers.pneumonia import router as pneumonia_router, lifespan
+
+# 2. FastAPI 앱 생성 시 lifespan 등록
+app = FastAPI(lifespan=lifespan)
 
 # Router 등록
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(patient_router)
 app.include_router(medical_record_router)
+
+# 3. 폐렴 예측 라우터 등록
+app.include_router(pneumonia_router)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,7 +58,7 @@ async def healthcheck():
 
 
 @app.get(
-    "/",
+    ",",
     include_in_schema=False,
 )
 async def index():
@@ -67,6 +74,7 @@ async def index():
 async def catch_all(path: str):
     if (
         path.startswith("api/v1")
+        or path.startswith("api/pneumonia")  # 폐렴 예측 API 경로도 예외 처리 추가
         or path.startswith("static/")
         or path.startswith("media/")
     ):

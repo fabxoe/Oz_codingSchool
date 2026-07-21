@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from starlette.responses import FileResponse
 from starlette.staticfiles import StaticFiles
 
+from app.apis.patient_api import router as patient_router
 from app.apis.admin_api import router as admin_router
 from app.apis.auth import router as session_router
 from app.apis.auth_api import router as auth_router
@@ -15,6 +16,7 @@ app = FastAPI()
 app.include_router(auth_router)
 app.include_router(session_router, prefix="/api/v1")
 app.include_router(admin_router)
+app.include_router(patient_router)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

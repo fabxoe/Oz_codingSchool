@@ -12,6 +12,8 @@ dependencies = [
     "pwdlib[argon2]>=0.3.0",
     "pydantic-settings>=2.13.1",
     "pyjwt>=2.13.0",
+    # 폐렴 예측 작업 큐 (API 서버는 큐에 넣기만 하고 추론은 worker가 한다)
+    "redis>=5.0.0",
     "sqlalchemy[asyncio]>=2.0.49",
     "uuid6>=2025.0.1",
 ]

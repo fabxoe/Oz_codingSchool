@@ -9,15 +9,15 @@ from app.apis.patient_api import router as patient_router
 from app.apis.admin_api import router as admin_router
 from app.apis.auth import router as session_router
 from app.apis.auth_api import router as auth_router
-from app.apis.patient import router as patient_router
-from app.apis.medical_record import router as medical_record_router
+from app.apis.patient_api import router as patient_router
 
 app = FastAPI()
 
-# Router 등록
+# Router 등록 (반드시 하단 catch_all 보다 위에서 등록할 것)
 app.include_router(auth_router)
 app.include_router(session_router, prefix="/api/v1")
 app.include_router(admin_router)
+app.include_router(patient_router)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

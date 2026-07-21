@@ -1,0 +1,29 @@
+# Docker 이미지 빌드 시 제외할 파일/폴더
+
+# 모델 파일 (약 609MB) — 볼륨으로 연결한다
+worker/models/
+
+# 파이썬
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Git
+.git/
+.gitignore
+
+# 환경변수
+.env
+
+# 업로드된 사용자 파일
+media/
+
+# 문서·에디터
+docs/
+.vscode/
+.idea/
+.DS_Store
+
+# 모델 번들 원본 (worker/ 로 이미 복사됨)
+pneumonia_ensemble_v1_bundle/

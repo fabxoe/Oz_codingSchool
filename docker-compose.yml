@@ -17,6 +17,45 @@ services:
       retries: 3
     depends_on:
       - mysql
+      - redis
+
+  # 폐렴 예측 작업 큐 + 작업 상태 저장
+  redis:
+    image: redis:8
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 모델 추론 전담 프로세스.
+  # 모델을 독점하므로 동시 요청으로 인한 내부 상태 꼬임이 없다.
+  # 처리량을 늘리려면: docker compose up --scale worker=2
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: root
+      DB_PASSWORD: ${DB_ROOT_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MEDIA_ROOT: /app/media
+    volumes:
+      # 코드 (수정 시 재빌드 없이 반영)
+      - ./worker:/app/worker
+      # 모델 파일 약 609MB — 이미지에 넣지 않고 볼륨으로 연결
+      - ./worker/models:/app/worker/models
+      # API 서버가 저장한 X-ray 이미지를 읽어야 한다
+      - media_volume:/app/media
+    depends_on:
+      - mysql
+      - redis
 
   mysql:
     image: mysql:8.0

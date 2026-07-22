@@ -317,8 +317,12 @@ const apis = {
      * [REQ-PRED-002] 특정 진료기록에 대해 수행된 모든 AI 예측 결과 목록을 조회한다.
      * 응답: { record_id, xray_image_url, predictions: [...] }
      */
-    async getMedicalRecordAnalyses(recordId) {
-        return await this.request(`/medical-records/${recordId}/predictions`);
+    async getMedicalRecordAnalyses(recordId, skipAlert = false) {
+        return await this.request(
+            `/medical-records/${recordId}/predictions`,
+            {},
+            skipAlert
+        );
     },
 
     // --- Admin ---

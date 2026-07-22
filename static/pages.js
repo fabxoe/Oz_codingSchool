@@ -146,8 +146,17 @@ const pages = {
     async renderRecordDetail(recordId) {
         const record = await apis.getMedicalRecord(recordId);
         // 예측 결과 목록 응답: { record_id, xray_image_url, predictions: [...] }
-        const analysisResponse = await apis.getMedicalRecordAnalyses(recordId);
-        const predictions = analysisResponse.predictions || [];
+        // 결과가 없으면 404 가 올 수 있으므로 조용히 빈 배열로 처리한다.
+        let predictions = [];
+        try {
+            const analysisResponse = await apis.getMedicalRecordAnalyses(recordId, true);
+            predictions = analysisResponse.predictions || [];
+        } catch (err) {
+            if (err.status !== 404) {
+                utils.showAlert(err.message, 'error', '오류');
+                throw err;
+            }
+        }
         const html = await utils.loadTemplate('record-detail');
         const app = document.getElementById('app');
         app.innerHTML = html;

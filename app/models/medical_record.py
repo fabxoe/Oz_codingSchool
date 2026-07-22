@@ -17,5 +17,11 @@ class MedicalRecord(Base):
 
      # 관계 설정
     patient: Mapped["Patient"] = relationship(back_populates="medical_records")
-    xray_images: Mapped[list["XrayImage"]] = relationship(back_populates="medical_record")
-    ai_analysis_results: Mapped[list["AIAnalysisResult"]] = relationship(back_populates="medical_record")
+    xray_images: Mapped[list["XrayImage"]] = relationship(
+        back_populates="medical_record",
+        passive_deletes=True,
+    )
+    ai_analysis_results: Mapped[list["AIAnalysisResult"]] = relationship(
+        back_populates="medical_record",
+        passive_deletes=True,
+    )

@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify FastAPI application
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DB_USER: ci_user
+      DB_PASSWORD: ci_password
+      DB_HOST: 127.0.0.1
+      DB_PORT: "3306"
+      DB_NAME: ci_database
+      JWT_SECRET_KEY: ci-only-secret-key-with-at-least-32-bytes
+      JWT_ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+      REFRESH_TOKEN_EXPIRE_DAYS: "7"
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install uv and Python
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+        with:
+          version: "0.11.30"
+          python-version: "3.14.4"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Compile Python sources
+        run: uv run python -m compileall -q app worker
+
+      - name: Verify FastAPI routes
+        run: uv run python -m scripts.ci_smoke

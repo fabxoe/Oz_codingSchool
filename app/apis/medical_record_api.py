@@ -7,6 +7,7 @@ from app.models.user import Role, User
 from app.schemas.medical_record import (
     MedicalRecordDetailResponse,
     MedicalRecordListItem,
+    AIAnalysisResultResponse,
 )
 from app.services.medical_record_service import MedicalRecordService
 
@@ -63,3 +64,16 @@ async def get_medical_record_detail(
     db: AsyncSession = Depends(async_get_db),
 ):
     return await MedicalRecordService.get_record_detail(db, record_id)
+
+@router.post(
+    "/medical-records/{record_id}/predict",
+    response_model=AIAnalysisResultResponse,
+    status_code=status.HTTP_200_OK,
+    summary="AI 폐렴 예측",
+)
+async def predict_ai(
+    record_id: int = Path(ge=1),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(async_get_db),
+):
+    return await MedicalRecordService.predict_ai(db, record_id)

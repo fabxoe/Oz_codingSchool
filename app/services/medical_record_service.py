@@ -1,16 +1,22 @@
 import uuid
 from datetime import datetime
 from pathlib import Path
+from decimal import Decimal
 
 from fastapi import HTTPException, UploadFile, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
+from app.models.ai_analysis_result import AIAnalysisResult
+from app.repositories.ai_analysis_result_repository import AIAnalysisResultRepository
+from worker.model import PneumoniaEnsemble
 from app.models.medical_record import MedicalRecord
 from app.repositories.medical_record_repository import MedicalRecordRepository
 from app.repositories.patient_repository import PatientRepository
 from app.schemas.medical_record import (
     MedicalRecordDetailResponse,
     MedicalRecordListItem,
+    AIAnalysisResultResponse,
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -18,6 +24,7 @@ XRAY_DIR = BASE_DIR / "media" / "xray"
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
 
+predictor = PneumoniaEnsemble()
 class MedicalRecordService:
 
     @staticmethod
@@ -144,3 +151,52 @@ class MedicalRecordService:
             xray_image_url=image_url,
             created_at=record.created_at,
         )
+
+    @staticmethod
+    async def predict_ai(
+        db: AsyncSession,
+        record_id: int,
+        ) -> AIAnalysisResultResponse:
+        record = await MedicalRecordRepository.get_by_id(db, record_id)
+        if record is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="진료기록을 찾을 수 없습니다.",
+            )
+
+        existing = await AIAnalysisResultRepository.get_by_record_id(
+            db,
+            record_id,
+        )
+
+        if existing is not None:
+            return AIAnalysisResultResponse.model_validate(existing)
+
+        image_url = await MedicalRecordRepository.get_latest_xray_image_url(
+            db,
+            record_id,
+        )
+
+        if image_url is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="X-ray 이미지를 찾을 수 없습니다.",
+            )
+
+        file_path = BASE_DIR / image_url.lstrip("/")
+
+        result = predictor.predict(file_path)
+        analysis = AIAnalysisResult(
+            record_id=record_id,
+            is_pneumonia=result["is_pneumonia"],
+            confidence=Decimal(str(result["confidence"])),
+            heatmap_url="",
+            ai_model=result["model"],
+        )
+
+        analysis = await AIAnalysisResultRepository.create(
+            db,
+            analysis,
+        )
+
+        return AIAnalysisResultResponse.model_validate(analysis)

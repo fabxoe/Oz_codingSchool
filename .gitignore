@@ -28,3 +28,6 @@ envs/
 
 # 업로드된 사용자 파일 (X-ray 이미지 등)
 media/
+
+# AI 모델 파일
+worker/models/

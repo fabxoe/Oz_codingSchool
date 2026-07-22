@@ -25,3 +25,13 @@ class MedicalRecordDetailResponse(BaseModel):
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+class AIAnalysisResultResponse(BaseModel):
+    """AI 폐렴 예측 결과 응답"""
+
+    is_pneumonia: bool
+    confidence: float
+    heatmap_url: str
+    ai_model: str
+
+    model_config = ConfigDict(from_attributes=True)

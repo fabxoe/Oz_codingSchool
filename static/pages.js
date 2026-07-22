@@ -498,9 +498,10 @@ const pages = {
                 return;
             }
 
-            // 새 작업이면 202 + job_id 를 받는다. 완료까지 1초 간격으로 폴링(최대 30회).
+            // 새 작업이면 202 + job_id 를 받는다. 완료까지 1초 간격으로 폴링.
+            // 도커(CPU) 환경에서는 10개 모델 추론이 오래 걸릴 수 있어 넉넉히 90초까지 기다린다.
             const jobId = res.job_id;
-            for (let i = 0; i < 30; i++) {
+            for (let i = 0; i < 90; i++) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 const job = await apis.getPredictionJob(jobId);
 

@@ -293,17 +293,32 @@ const apis = {
     /**
      * AI 폐렴 예측 수행
      * [REQ-PRED-001] 진료기록에 등록된 X-ray 이미지를 활용하여 폐렴 여부를 예측한다.
+     *
+     * 추론이 3~5초 걸리므로 서버는 비동기로 동작한다.
+     *   - 저장된 결과가 있으면  200 { status: "done",   cached: true,  result }
+     *   - 새로 추론해야 하면    202 { status: "queued", cached: false, job_id, poll_url }
+     * 202를 받으면 getPredictionJob 으로 완료될 때까지 폴링한다.
      */
     async predictPneumonia(recordId) {
-        return await this.request(`/medical-records/${recordId}/predict`, { method: 'POST' });
+        return await this.request(`/medical-records/${recordId}/predictions`, { method: 'POST' });
+    },
+
+    /**
+     * 예측 작업 상태 조회 (폴링용)
+     * status: queued | processing | done | failed
+     * done 이면 result 에 예측 결과가 담긴다.
+     */
+    async getPredictionJob(jobId) {
+        return await this.request(`/predictions/jobs/${jobId}`);
     },
 
     /**
      * AI 예측 결과 목록 조회
      * [REQ-PRED-002] 특정 진료기록에 대해 수행된 모든 AI 예측 결과 목록을 조회한다.
+     * 응답: { record_id, xray_image_url, predictions: [...] }
      */
     async getMedicalRecordAnalyses(recordId) {
-        return await this.request(`/medical-records/${recordId}/analyses`);
+        return await this.request(`/medical-records/${recordId}/predictions`);
     },
 
     // --- Admin ---

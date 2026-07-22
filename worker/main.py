@@ -45,6 +45,9 @@ class PredictionWorker:
             host=config.REDIS_HOST,
             port=config.REDIS_PORT,
             decode_responses=True,
+            # 유휴 상태에서 연결이 끊기지 않도록 keepalive 와 주기적 health check 를 켠다.
+            socket_keepalive=True,
+            health_check_interval=30,
         )
 
         log("DB 연결 중...")
@@ -148,7 +151,14 @@ class PredictionWorker:
         log(f"큐 대기 시작: {config.QUEUE_KEY}")
         while True:
             # BLPOP: 큐가 빌 때까지 블로킹. timeout=5 로 주기적으로 깨어난다.
-            popped = self.redis.blpop(config.QUEUE_KEY, timeout=5)
+            # 대기 중 소켓 타임아웃 등 Redis 예외가 나도 worker 가 죽지 않고
+            # 잠시 쉬었다가 다시 대기한다.
+            try:
+                popped = self.redis.blpop(config.QUEUE_KEY, timeout=5)
+            except redis.exceptions.RedisError as error:
+                log(f"큐 대기 재시도: {error}")
+                time.sleep(1)
+                continue
             if popped is None:
                 continue
 

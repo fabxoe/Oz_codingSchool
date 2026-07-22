@@ -3,13 +3,23 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
+    working_dir: /code
     entrypoint: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      # config.py 의 기본값(localhost)을 컨테이너 네트워크의 서비스명으로 덮어쓴다.
+      # (환경변수가 .env 파일보다 우선한다)
+      DB_HOST: mysql
+      REDIS_HOST: redis
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app
-      - static_volume:/app/static
-      - media_volume:/app/media
+      # 프로젝트 전체를 마운트한다. main.py 의 BASE_DIR 이 /code 가 되어
+      # /code/static, /code/media 경로가 코드와 일치한다.
+      - .:/code
+      # 이미지에서 만든 가상환경(.venv)이 위 마운트에 가려지지 않도록 보호
+      - /code/.venv
+      # 업로드된 X-ray 이미지는 영속 볼륨에 저장 (worker 와 공유)
+      - media_volume:/code/media
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/healthcheck || exit 1"]
       interval: 5s
@@ -77,5 +87,4 @@ services:
 
 volumes:
   mysql_volume:
-  static_volume:
   media_volume:

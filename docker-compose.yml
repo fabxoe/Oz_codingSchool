@@ -3,13 +3,23 @@ services:
     build:
       context: .
       dockerfile: app/Dockerfile
+    working_dir: /code
     entrypoint: sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    environment:
+      # config.py 의 기본값(localhost)을 컨테이너 네트워크의 서비스명으로 덮어쓴다.
+      # (환경변수가 .env 파일보다 우선한다)
+      DB_HOST: mysql
+      REDIS_HOST: redis
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app
-      - static_volume:/app/static
-      - media_volume:/app/media
+      # 프로젝트 전체를 마운트한다. main.py 의 BASE_DIR 이 /code 가 되어
+      # /code/static, /code/media 경로가 코드와 일치한다.
+      - .:/code
+      # 이미지에서 만든 가상환경(.venv)이 위 마운트에 가려지지 않도록 보호
+      - /code/.venv
+      # 업로드된 X-ray 이미지는 영속 볼륨에 저장 (worker 와 공유)
+      - media_volume:/code/media
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/healthcheck || exit 1"]
       interval: 5s
@@ -17,6 +27,45 @@ services:
       retries: 3
     depends_on:
       - mysql
+      - redis
+
+  # 폐렴 예측 작업 큐 + 작업 상태 저장
+  redis:
+    image: redis:8
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # 모델 추론 전담 프로세스.
+  # 모델을 독점하므로 동시 요청으로 인한 내부 상태 꼬임이 없다.
+  # 처리량을 늘리려면: docker compose up --scale worker=2
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: root
+      DB_PASSWORD: ${DB_ROOT_PASSWORD}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      MEDIA_ROOT: /app/media
+    volumes:
+      # 코드 (수정 시 재빌드 없이 반영)
+      - ./worker:/app/worker
+      # 모델 파일 약 609MB — 이미지에 넣지 않고 볼륨으로 연결
+      - ./worker/models:/app/worker/models
+      # API 서버가 저장한 X-ray 이미지를 읽어야 한다
+      - media_volume:/app/media
+    depends_on:
+      - mysql
+      - redis
 
   mysql:
     image: mysql:8.0
@@ -38,5 +87,4 @@ services:
 
 volumes:
   mysql_volume:
-  static_volume:
   media_volume:

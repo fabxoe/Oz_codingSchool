@@ -28,3 +28,8 @@ envs/
 
 # 업로드된 사용자 파일 (X-ray 이미지 등)
 media/
+
+# AI 모델 파일 (약 609MB, GitHub 100MB 제한 초과)
+# 팀원에게는 별도 경로로 공유하고 컨테이너에는 볼륨으로 연결한다
+worker/models/
+pneumonia_ensemble_v1_bundle/

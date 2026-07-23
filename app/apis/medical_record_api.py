@@ -77,3 +77,15 @@ async def predict_ai(
     db: AsyncSession = Depends(async_get_db),
 ):
     return await MedicalRecordService.predict_ai(db, record_id)
+
+@router.get(
+    "/medical-records/{record_id}/analyses",
+    response_model=list[AIAnalysisResultResponse],
+    summary="AI 분석 결과 조회",
+)
+async def get_ai_analysis(
+    record_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(async_get_db),
+):
+    return await MedicalRecordService.get_ai_analysis(db, record_id)

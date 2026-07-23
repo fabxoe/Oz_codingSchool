@@ -33,5 +33,6 @@ class AIAnalysisResultResponse(BaseModel):
     confidence: float
     heatmap_url: str
     ai_model: str
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

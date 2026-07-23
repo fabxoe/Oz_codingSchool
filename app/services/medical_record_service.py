@@ -200,3 +200,21 @@ class MedicalRecordService:
         )
 
         return AIAnalysisResultResponse.model_validate(analysis)
+
+    @staticmethod
+    async def get_ai_analysis(
+        db: AsyncSession,
+        record_id: int,
+    ) -> list[AIAnalysisResultResponse]:
+        analysis = await AIAnalysisResultRepository.get_by_record_id(
+            db,
+            record_id,
+        )
+
+        if analysis is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="저장된 예측 결과가 없습니다.",
+            )
+
+        return [AIAnalysisResultResponse.model_validate(analysis)]

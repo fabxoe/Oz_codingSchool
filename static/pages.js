@@ -186,7 +186,7 @@ const pages = {
                             <tr class="${a.is_pneumonia ? 'result-positive' : 'result-negative'}">
                                 <td>${new Date(a.created_at).toLocaleString()}</td>
                                 <td><strong>${a.is_pneumonia ? 'Positive' : 'Negative'}</strong></td>
-                                <td>${a.confidence}%</td>
+                                <td>${(a.confidence * 100).toFixed(1)}%</td>
                                 <td>${a.ai_model}</td>
                             </tr>
                         `).join('')}

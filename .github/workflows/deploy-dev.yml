@@ -51,6 +51,12 @@ jobs:
           launchctl kickstart -k \
             "gui/$(id -u)/com.ozcoding.ai-health-web"
 
+      - name: Install and restart prediction runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash "$HOME/workbench/AH_web_development_assignment/scripts/install_prediction_runtime.sh"
+
       - name: Verify deployment
         shell: bash
         run: |
@@ -71,4 +77,33 @@ jobs:
 
           echo "Deployment health check failed."
           tail -n 100 "$HOME/Library/Logs/ai-health-web.err.log" || true
+          exit 1
+
+      - name: Verify prediction runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          redis-cli ping | grep -q PONG
+
+          for attempt in {1..90}; do
+            if grep -q "큐 대기 시작" \
+              "$HOME/Library/Logs/ai-health-worker.log" 2>/dev/null; then
+              echo "Prediction worker is ready."
+              exit 0
+            fi
+
+            if ! launchctl print \
+              "gui/$(id -u)/com.ozcoding.ai-health-worker" >/dev/null 2>&1; then
+              echo "Prediction worker service is not loaded."
+              break
+            fi
+
+            echo "Waiting for prediction model (${attempt}/90)..."
+            sleep 2
+          done
+
+          echo "Prediction worker did not become ready."
+          tail -n 100 "$HOME/Library/Logs/ai-health-worker.log" || true
+          tail -n 100 "$HOME/Library/Logs/ai-health-worker.err.log" || true
           exit 1

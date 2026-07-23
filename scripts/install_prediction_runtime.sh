@@ -82,9 +82,17 @@ cat > "$PLIST_PATH" <<PLIST
 PLIST
 
 plutil -lint "$PLIST_PATH"
-launchctl bootout "$SERVICE_NAME" >/dev/null 2>&1 || true
-launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH"
-launchctl enable "$SERVICE_NAME"
-launchctl kickstart -k "$SERVICE_NAME"
+: > "$WORKER_LOG"
+: > "$WORKER_ERROR_LOG"
+
+if launchctl print "$SERVICE_NAME" >/dev/null 2>&1; then
+    # A self-hosted Actions runner can restart an existing GUI service, but
+    # cannot reliably bootstrap it after removing it from the GUI domain.
+    launchctl kickstart -k "$SERVICE_NAME"
+else
+    launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH"
+    launchctl enable "$SERVICE_NAME"
+    launchctl kickstart -k "$SERVICE_NAME"
+fi
 
 echo "Prediction runtime installation completed."

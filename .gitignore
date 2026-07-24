@@ -23,6 +23,10 @@ settings.json
 envs/
 *.env
 .env
+# .env.local, .env.deploy 등 모든 환경 파일 (gitignore는 줄 끝 주석 미지원)
+.env.*
+# 단, 예시 파일은 커밋 허용 (비밀값 없음)
+!.env.example
 
 .python-version
 

@@ -13,14 +13,28 @@ __pycache__/
 .git/
 .gitignore
 
-# 환경변수
+# 환경변수 (모든 .env 파일: .env, .env.local, .env.deploy 등)
 .env
+.env.*
+
+# 라이브러리 캐시 (mypy, pytest, ruff 등)
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # 업로드된 사용자 파일
 media/
 
-# 문서·에디터
+# 문서
 docs/
+README.md
+
+# 도커 관련 설정 파일 (이미지 안에 넣을 필요 없음)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE·에디터 설정
 .vscode/
 .idea/
 .DS_Store

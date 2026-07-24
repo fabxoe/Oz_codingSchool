@@ -1,0 +1,11 @@
+sample_file,true_label,true_class,difficulty_band,predicted_label,predicted_class,prediction_correct,confidence,pneumonia_probability,decision_score,decision_threshold,model
+normal_01_high_train_0716.png,0,NORMAL,high,0,NORMAL,1,0.9949516556225717,0.005048344377428293,-0.6585791365864686,0.025,pneumonia_ensemble_v1
+normal_02_high_train_1074.png,0,NORMAL,high,0,NORMAL,1,0.9854995859786868,0.01450041402131319,-0.6436389776291422,0.025,pneumonia_ensemble_v1
+normal_03_high_train_0446.png,0,NORMAL,high,0,NORMAL,1,0.9883473524823785,0.011652647517621517,-0.6495227974256494,0.025,pneumonia_ensemble_v1
+normal_04_moderate_train_1336.png,0,NORMAL,moderate,0,NORMAL,1,0.9350564330816269,0.06494356691837311,-0.576261944522127,0.025,pneumonia_ensemble_v1
+normal_05_boundary_train_0094.png,0,NORMAL,boundary,0,NORMAL,1,0.8561887443065643,0.14381125569343567,-0.47244638788639404,0.025,pneumonia_ensemble_v1
+pneumonia_01_boundary_train_3143.png,1,PNEUMONIA,boundary,1,PNEUMONIA,1,0.7371817827224731,0.7371817827224731,0.546548180305612,0.025,pneumonia_ensemble_v1
+pneumonia_02_moderate_train_4682.png,1,PNEUMONIA,moderate,1,PNEUMONIA,1,0.9086214303970337,0.9086214303970337,0.7598827845255794,0.025,pneumonia_ensemble_v1
+pneumonia_03_high_train_2027.png,1,PNEUMONIA,high,1,PNEUMONIA,1,0.9263370633125305,0.9263370633125305,0.7759541909487264,0.025,pneumonia_ensemble_v1
+pneumonia_04_high_train_4572.png,1,PNEUMONIA,high,1,PNEUMONIA,1,0.9698312282562256,0.9698312282562256,0.832396800589792,0.025,pneumonia_ensemble_v1
+pneumonia_05_high_train_4072.png,1,PNEUMONIA,high,1,PNEUMONIA,1,0.9970400333404541,0.9970400333404541,0.8862914535361056,0.025,pneumonia_ensemble_v1

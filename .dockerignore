@@ -41,3 +41,19 @@ docker-compose.yml
 
 # 모델 번들 원본 (worker/ 로 이미 복사됨)
 pneumonia_ensemble_v1_bundle/
+
+# 라이브러리 캐시
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# 도커 설정 파일 자체 (빌드 컨텍스트에 포함될 필요 없음)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# README
+README.md
+
+# 환경파일 전체 (.env, .env.local, .env.production 등 모두 커버)
+.env.*

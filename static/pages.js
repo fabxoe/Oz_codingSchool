@@ -145,22 +145,33 @@ const pages = {
 
     async renderRecordDetail(recordId) {
         const record = await apis.getMedicalRecord(recordId);
-        const analyses = await apis.getMedicalRecordAnalyses(recordId);
+        // 예측 결과 목록 응답: { record_id, xray_image_url, predictions: [...] }
+        // 결과가 없으면 404 가 올 수 있으므로 조용히 빈 배열로 처리한다.
+        let predictions = [];
+        try {
+            const analysisResponse = await apis.getMedicalRecordAnalyses(recordId, true);
+            predictions = analysisResponse.predictions || [];
+        } catch (err) {
+            if (err.status !== 404) {
+                utils.showAlert(err.message, 'error', '오류');
+                throw err;
+            }
+        }
         const html = await utils.loadTemplate('record-detail');
         const app = document.getElementById('app');
         app.innerHTML = html;
-        
+
         document.getElementById('record-id').innerText = record.id;
         document.getElementById('chart-number').innerText = record.chart_number;
         document.getElementById('symptoms-text').innerText = record.symptoms;
         document.getElementById('created-at').innerText = new Date(record.created_at).toLocaleString();
         document.getElementById('xray-img').src = record.xray_image_url;
-        
+
         document.getElementById('predict-btn').onclick = () => this.handlePredict(recordId);
         document.getElementById('back-to-patient-btn').onclick = () => navigate(`/patients/${record.patient_id}`);
-        
+
         const analysisList = document.getElementById('analysis-list');
-        if (analyses.length === 0) {
+        if (predictions.length === 0) {
             analysisList.innerHTML = '<p>저장된 예측 결과가 없습니다.</p>';
         } else {
             analysisList.innerHTML = `
@@ -174,11 +185,11 @@ const pages = {
                         </tr>
                     </thead>
                     <tbody>
-                        ${analyses.map(a => `
+                        ${predictions.map(a => `
                             <tr class="${a.is_pneumonia ? 'result-positive' : 'result-negative'}">
                                 <td>${new Date(a.created_at).toLocaleString()}</td>
                                 <td><strong>${a.is_pneumonia ? 'Positive' : 'Negative'}</strong></td>
-                                <td>${a.confidence}%</td>
+                                <td>${(a.confidence * 100).toFixed(1)}%</td>
                                 <td>${a.ai_model}</td>
                             </tr>
                         `).join('')}
@@ -314,7 +325,7 @@ const pages = {
             e.target.reset();
         } catch (err) {
             let msg = err.message;
-            if (err.status === 400) {
+            if (err.status === 400 && msg.includes('비밀번호는 대소문자')) {
                 msg = '비밀번호는 "대소문자, 특수문자, 숫자를 각 1개씩 포함한 8자리 이상이어야 합니다."';
             } else if (err.status === 500) {
                 msg = '잠시 후 다시시도해주세요.';
@@ -470,12 +481,47 @@ const pages = {
     },
 
     async handlePredict(recordId) {
+        const btn = document.getElementById('predict-btn');
+        const originalText = btn ? btn.innerText : 'AI 예측 결과보기';
         try {
-            await apis.predictPneumonia(recordId);
-            utils.showAlert('AI 예측이 완료되었습니다.', 'success');
-            navigate(`/medical-records/${recordId}`, false);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = 'AI 예측 중...';
+            }
+
+            const res = await apis.predictPneumonia(recordId);
+
+            // 저장된 결과가 있으면(cached) 추론 없이 바로 반영된다.
+            if (res.cached) {
+                utils.showAlert('저장된 예측 결과를 불러왔습니다.', 'success');
+                navigate(`/medical-records/${recordId}`, false);
+                return;
+            }
+
+            // 새 작업이면 202 + job_id 를 받는다. 완료까지 1초 간격으로 폴링.
+            // 도커(CPU) 환경에서는 10개 모델 추론이 오래 걸릴 수 있어 넉넉히 90초까지 기다린다.
+            const jobId = res.job_id;
+            for (let i = 0; i < 90; i++) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                const job = await apis.getPredictionJob(jobId);
+
+                if (job.status === 'done') {
+                    utils.showAlert('AI 예측이 완료되었습니다.', 'success');
+                    navigate(`/medical-records/${recordId}`, false);
+                    return;
+                }
+                if (job.status === 'failed') {
+                    throw new Error(job.error || '예측에 실패했습니다.');
+                }
+                // queued | processing 이면 계속 기다린다.
+            }
+            throw new Error('예측 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
         } catch (err) {
             utils.showAlert(`AI 예측 실패: ${err.message}`, 'error');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
         }
     }
 };

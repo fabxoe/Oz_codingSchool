@@ -1,0 +1,59 @@
+# Docker 이미지 빌드 시 제외할 파일/폴더
+
+# 모델 파일 (약 609MB) — 볼륨으로 연결한다
+worker/models/
+
+# 파이썬
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Git
+.git/
+.gitignore
+
+# 환경변수 (모든 .env 파일: .env, .env.local, .env.deploy 등)
+.env
+.env.*
+
+# 라이브러리 캐시 (mypy, pytest, ruff 등)
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# 업로드된 사용자 파일
+media/
+
+# 문서
+docs/
+README.md
+
+# 도커 관련 설정 파일 (이미지 안에 넣을 필요 없음)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE·에디터 설정
+.vscode/
+.idea/
+.DS_Store
+
+# 모델 번들 원본 (worker/ 로 이미 복사됨)
+pneumonia_ensemble_v1_bundle/
+
+# 라이브러리 캐시
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# 도커 설정 파일 자체 (빌드 컨텍스트에 포함될 필요 없음)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# README
+README.md
+
+# 환경파일 전체 (.env, .env.local, .env.production 등 모두 커버)
+.env.*
